@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>오늘 뭐 듣지 - 랜덤 노래 추천</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* 기본값 = 노을(sunset). 시간대는 html[data-phase]로 덮어씀 */
+  :root {
+    --bg: #47206f;
+    --sky:
+      radial-gradient(circle 96px at 50% 100%, #fff1b8 0 97%, rgba(255,241,184,0) 100%),
+      radial-gradient(circle 340px at 50% 100%, rgba(255,190,100,0.6), rgba(255,160,74,0) 100%),
+      linear-gradient(180deg, #1f1147 0%, #47206f 35%, #8f2f80 62%, #d1466f 80%, #f26c47 92%, #ffa04a 100%);
+    --ink: #fff7ec;
+    --muted: #ffdccf;
+    --accent: #ffd36e;
+    --accent-ink: #2a1050;
+    --disc: #1a0d3d;
+    --groove: #2f1c62;
+    --panel: rgba(28, 12, 66, 0.55);
+    --line: rgba(255, 255, 255, 0.2);
+    --shadow: rgba(20, 8, 50, 0.5);
+    --title-shadow: 0 2px 20px rgba(20, 8, 50, 0.4);
+    --display: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* 새벽 05~08시 */
+  :root[data-phase="dawn"] {
+    --bg: #4f4a95;
+    --sky:
+      radial-gradient(circle 74px at 50% 100%, #ffe6b8 0 97%, rgba(255,230,184,0) 100%),
+      radial-gradient(circle 320px at 50% 100%, rgba(255,170,140,0.55), rgba(255,170,140,0) 100%),
+      linear-gradient(180deg, #26295f 0%, #4f4a95 45%, #9a6aa8 68%, #e79a9f 88%, #ffc79a 100%);
+    --ink: #fff8f0;
+    --muted: #ffe6dd;
+    --accent: #ffd08a;
+    --accent-ink: #2a1148;
+    --disc: #1c1244;
+    --groove: #34266c;
+    --panel: rgba(30, 18, 72, 0.5);
+    --line: rgba(255, 255, 255, 0.22);
+    --shadow: rgba(20, 10, 60, 0.45);
+    --title-shadow: 0 2px 20px rgba(20, 10, 60, 0.4);
+  }
+
+  /* 아침 08~11시 */
+  :root[data-phase="morning"] {
+    --bg: #6cb8f2;
+    --sky:
+      radial-gradient(circle 32px at 22% 14%, #fff6cf 0 95%, rgba(255,246,207,0) 100%),
+      radial-gradient(circle 190px at 22% 14%, rgba(255,240,190,0.7), rgba(255,240,190,0) 100%),
+      radial-gradient(ellipse 140px 34px at 72% 24%, rgba(255,255,255,0.6), rgba(255,255,255,0) 100%),
+      radial-gradient(ellipse 110px 28px at 30% 70%, rgba(255,255,255,0.5), rgba(255,255,255,0) 100%),
+      linear-gradient(180deg, #6cb8f2 0%, #bfe4fa 60%, #ffe9c8 100%);
+    --ink: #10305c;
+    --muted: #2d5185;
+    --accent: #ff9a52;
+    --accent-ink: #1d1030;
+    --disc: #1d2f5e;
+    --groove: #33508a;
+    --panel: rgba(255, 255, 255, 0.62);
+    --line: rgba(16, 48, 92, 0.2);
+    --shadow: rgba(20, 45, 100, 0.35);
+    --title-shadow: 0 1px 16px rgba(255, 255, 255, 0.55);
+  }
+
+  /* 낮 11~17시 */
+  :root[data-phase="day"] {
+    --bg: #5fb0ee;
+    --sky:
+      radial-gradient(circle 34px at 82% 12%, #fffbe0 0 95%, rgba(255,251,224,0) 100%),
+      radial-gradient(circle 200px at 82% 12%, rgba(255,244,180,0.75), rgba(255,244,180,0) 100%),
+      radial-gradient(ellipse 130px 34px at 18% 26%, rgba(255,255,255,0.6), rgba(255,255,255,0) 100%),
+      radial-gradient(ellipse 170px 40px at 70% 60%, rgba(255,255,255,0.5), rgba(255,255,255,0) 100%),
+      radial-gradient(ellipse 110px 28px at 26% 84%, rgba(255,255,255,0.5), rgba(255,255,255,0) 100%),
+      linear-gradient(180deg, #2f86dd 0%, #5fb0ee 55%, #a8daf7 100%);
+    --ink: #0c2a55;
+    --muted: #274b80;
+    --accent: #ff8a3d;
+    --accent-ink: #1d1030;
+    --disc: #16274f;
+    --groove: #2b4a86;
+    --panel: rgba(255, 255, 255, 0.62);
+    --line: rgba(12, 42, 85, 0.2);
+    --shadow: rgba(15, 35, 80, 0.35);
+    --title-shadow: 0 1px 16px rgba(255, 255, 255, 0.55);
+  }
+
+  /* 노을 17~19시 = 기본값 */
+
+  /* 해질녘 19~21시 */
+  :root[data-phase="dusk"] {
+    --bg: #2a1257;
+    --sky:
+      radial-gradient(circle 96px at 50% 100%, #f7d58a 0 97%, rgba(247,213,138,0) 100%),
+      radial-gradient(circle 340px at 50% 100%, rgba(255,160,90,0.38), rgba(255,140,74,0) 100%),
+      linear-gradient(180deg, #0f0826 0%, #2a1257 35%, #5c1f6b 62%, #a53a5f 80%, #d35a3a 92%, #e8863f 100%);
+    --accent: #ffc857;
+    --disc: #0c0620;
+    --groove: #24154f;
+    --panel: rgba(12, 5, 32, 0.6);
+  }
+
+  /* 밤 21~05시 */
+  :root[data-phase="night"] {
+    --bg: #0b0f2e;
+    --sky:
+      radial-gradient(circle 28px at 80% 12%, #fbf6df 0 96%, rgba(251,246,223,0) 100%),
+      radial-gradient(circle 150px at 80% 12%, rgba(210,220,255,0.22), rgba(210,220,255,0) 100%),
+      radial-gradient(circle 2px at 12% 18%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 1.5px at 27% 8%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 2px at 44% 22%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 1.5px at 61% 10%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 2px at 90% 30%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 1.5px at 8% 46%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 2px at 35% 58%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 1.5px at 72% 52%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 2px at 55% 74%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 1.5px at 18% 86%, #fff, rgba(255,255,255,0)),
+      radial-gradient(circle 2px at 88% 82%, #fff, rgba(255,255,255,0)),
+      linear-gradient(180deg, #04050d 0%, #0b0f2e 55%, #1a1c55 100%);
+    --ink: #f2f0ff;
+    --muted: #b9b5e8;
+    --accent: #ffe08a;
+    --accent-ink: #1a1240;
+    --disc: #070516;
+    --groove: #1b1846;
+    --panel: rgba(8, 6, 34, 0.58);
+    --line: rgba(255, 255, 255, 0.18);
+    --shadow: rgba(0, 0, 0, 0.55);
+    --title-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html.intro-on body { overflow: hidden; }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--sky);
+    pointer-events: none;
+  }
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 20px 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* 레코드판 */
+  .record {
+    position: relative;
+    width: min(62vw, 250px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle at center, var(--disc) 0 3px, var(--groove) 3px 4px);
+    box-shadow: 0 18px 44px var(--shadow);
+    transition: transform 1.3s cubic-bezier(0.12, 0.75, 0.2, 1);
+  }
+  .record::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, transparent 0 18%, rgba(255,255,255,0.16) 24%, transparent 30% 68%, rgba(255,255,255,0.12) 74%, transparent 80%);
+  }
+  .label {
+    position: absolute;
+    inset: 33%;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: grid;
+    place-items: center;
+    font-family: var(--display);
+    font-size: 0.95rem;
+    z-index: 1;
+  }
+  .label::before {
+    content: "";
+    position: absolute;
+    top: 9%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border-radius: 50%;
+    background: var(--accent-ink);
+    opacity: 0.85;
+  }
+
+  /* 버튼 (레코드 바로 아래) */
+  .pick {
+    margin-top: 30px;
+    font-family: var(--display);
+    font-size: 1.4rem;
+    padding: 14px 40px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+  .pick:hover:not(:disabled) { transform: translateY(-2px); }
+  .pick:active:not(:disabled) { transform: translateY(1px); }
+  .pick:disabled { opacity: 0.6; cursor: default; }
+  .pick:focus-visible, .listen:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .count {
+    margin: 14px 0 0;
+    padding: 2px 14px;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--panel);
+    border-radius: 999px;
+  }
+  .count:empty { display: none; }
+
+  /* 결과 */
+  .result {
+    margin-top: 30px;
+    min-height: 150px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .song-title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2rem, 8.5vw, 3.6rem);
+    line-height: 1.15;
+    margin: 0;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-shadow: var(--title-shadow);
+  }
+  .song-title.rolling { color: var(--muted); }
+  .song-artist {
+    margin: 10px 0 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .empty {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 22em;
+  }
+  .listen {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .listen:hover { text-decoration-thickness: 4px; }
+
+  /* 지난 곡 */
+  .history {
+    width: 100%;
+    margin-top: 32px;
+    padding: 18px 20px 10px;
+    background: var(--panel);
+    border-radius: 18px;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    text-align: left;
+  }
+  .history[hidden] { display: none; }
+  .history h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.05rem;
+    margin: 0 0 10px;
+  }
+  .history ol { list-style: none; margin: 0; padding: 0; }
+  .history li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    overflow-wrap: anywhere;
+  }
+  .history li span { color: var(--muted); }
+  .note {
+    margin: 32px 0 0;
+    padding: 4px 16px;
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--panel);
+    border-radius: 999px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* 인트로: 검은 화면 + 안개처럼 사라지는 제목 */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: #000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    animation: intro-out 4.6s ease forwards;
+  }
+  .intro[hidden] { display: none; }
+  .intro-title {
+    position: relative;
+    padding: 0 20px;
+    text-align: center;
+    word-break: keep-all;
+    font-family: var(--display);
+    font-size: clamp(2.6rem, 11vw, 5rem);
+    color: #fff;
+    text-shadow: 0 0 34px rgba(255, 255, 255, 0.35);
+    animation: intro-text 3.8s ease-in-out both;
+  }
+  .mist {
+    position: absolute;
+    width: 90vmax;
+    height: 90vmax;
+    border-radius: 50%;
+    opacity: 0;
+    animation: mist-in 3.8s ease-in-out both, drift 14s ease-in-out infinite alternate;
+  }
+  .mist-a {
+    left: -30vmax;
+    top: -25vmax;
+    background: radial-gradient(circle, rgba(190, 180, 255, 0.16), rgba(190, 180, 255, 0) 65%);
+  }
+  .mist-b {
+    right: -35vmax;
+    bottom: -30vmax;
+    background: radial-gradient(circle, rgba(255, 190, 200, 0.12), rgba(255, 190, 200, 0) 65%);
+    animation-delay: 0.3s, 0s;
+  }
+  @keyframes intro-out {
+    0%, 78% { opacity: 1; visibility: visible; }
+    99% { opacity: 0; visibility: visible; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  @keyframes intro-text {
+    0%   { opacity: 0; filter: blur(20px); transform: scale(0.94); letter-spacing: 0.02em; }
+    22%  { opacity: 1; filter: blur(0);    transform: scale(1);    letter-spacing: 0.02em; }
+    58%  { opacity: 1; filter: blur(0);    transform: scale(1);    letter-spacing: 0.03em; }
+    100% { opacity: 0; filter: blur(30px); transform: scale(1.14); letter-spacing: 0.14em; }
+  }
+  @keyframes mist-in {
+    0%   { opacity: 0; }
+    30%  { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes drift {
+    from { transform: translate3d(-4vmax, -2vmax, 0) scale(1); }
+    to   { transform: translate3d(6vmax, 4vmax, 0) scale(1.15); }
+  }
+  @keyframes intro-text-rm {
+    0%   { opacity: 0; }
+    25%  { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .record, .pick { transition: none; }
+    .mist { display: none; }
+    .intro { animation-duration: 3s; }
+    .intro-title { animation: intro-text-rm 2.4s ease-in-out both; }
+  }
+
+  /* ===== 추가 기능 ===== */
+  @property --h { syntax: "<number>"; inherits: true; initial-value: 280; }
+  :root { --h: 280; transition: --h 1.2s ease; }
+  :root[data-song] {
+    --disc: hsl(var(--h) 55% 12%);
+    --groove: hsl(var(--h) 42% 30%);
+    --accent: hsl(var(--h) 90% 66%);
+    --accent-ink: #1b1030;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    background:
+      radial-gradient(circle at 50% 28%, hsl(var(--h) 90% 62% / 0.5), transparent 62%),
+      linear-gradient(180deg, hsl(var(--h) 75% 32% / 0.35), hsl(calc(var(--h) + 50) 85% 58% / 0.35));
+  }
+  :root[data-song] body::after { opacity: 1; }
+  #fx { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
+  .bar { position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 40; display: flex; gap: 8px; }
+  .chip, .act {
+    font: 500 0.95rem var(--body);
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .chip { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .act:hover, .chip:hover { border-color: var(--accent); }
+  .act[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .act:focus-visible, .chip:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .song-meta { margin: 6px 0 0; font-size: 0.95rem; color: var(--muted); }
+  .song-desc { margin: 12px 0 0; max-width: 26em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
+  .actions[hidden] { display: none; }
+  .result { min-height: 240px; }
+  .history .act { margin: 12px 0 8px; }
+  dialog {
+    border: 0; border-radius: 20px; padding: 24px 22px;
+    width: min(92vw, 440px);
+    background: var(--bg); color: var(--ink);
+    font-family: var(--body);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  }
+  dialog::backdrop { background: rgba(8, 4, 24, 0.62); }
+  dialog h2 { font: 400 1.3rem var(--display); margin: 0 0 14px; }
+  dialog ol { margin: 0 0 18px; padding-left: 1.3em; }
+  dialog li { margin: 6px 0; }
+  .opt { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .opt input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .lib-list { list-style: none; margin: 12px 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
+  .lib-list li { padding: 8px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+  .lib-list li span, .lib-empty { color: var(--muted); }
+  .calm *, .calm *::before, .calm *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+  .calm .mist, .calm #fx { display: none; }
+</style>
+</head>
+<body>
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="mist mist-a"></div>
+  <div class="mist mist-b"></div>
+  <div class="intro-title">오늘 뭐 듣지</div>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<main id="app">
+  <nav class="bar" aria-label="메뉴">
+    <button class="chip" id="openLib" type="button">내 곡</button>
+    <button class="chip" id="openSet" type="button">설정</button>
+  </nav>
+  <h1 class="sr-only">오늘 뭐 듣지</h1>
+
+  <div class="record" id="record" aria-hidden="true">
+    <div class="label">랜덤</div>
+  </div>
+
+  <button class="pick" id="pick" type="button">노래 뽑기</button>
+  <p class="count" id="count"></p>
+  <p class="sr-only" id="status" aria-live="polite"></p>
+
+  <section class="result" id="result">
+    <p class="empty" id="empty">버튼을 누르면 인기곡 중 한 곡이 나와요.</p>
+    <h2 class="song-title" id="title" hidden></h2>
+    <p class="song-artist" id="artist" hidden></p>
+    <p class="song-meta" id="meta" hidden></p>
+    <p class="song-desc" id="desc" hidden></p>
+    <div class="actions" id="actions" hidden>
+      <button class="act" id="like" type="button" aria-pressed="false">♡ 좋아요</button>
+      <a class="act" id="lyrics" href="#" target="_blank" rel="noopener noreferrer">가사 보기</a>
+      <a class="act" id="listen" href="#" target="_blank" rel="noopener noreferrer">YouTube에서 듣기</a>
+    </div>
+  </section>
+
+  <section class="history" id="history" hidden>
+    <h2>방금 뽑은 곡</h2>
+    <ol id="historyList"></ol>
+    <button class="act" id="openAll" type="button">뽑은 곡 전체 보기</button>
+  </section>
+
+  <p class="note" id="note"></p>
+</main>
+
+<dialog id="guide">
+  <h2>이렇게 써요</h2>
+  <ol>
+    <li>"노래 뽑기"를 누르면 인기곡 중 한 곡이 랜덤으로 나와요.</li>
+    <li>곡마다 배경과 레코드판 색이 바뀌어요.</li>
+    <li>♡로 좋아요를 누르고, "가사 보기"로 가사 사이트에 갈 수 있어요.</li>
+    <li>뽑은 곡은 자동으로 저장돼요. 위쪽 "내 곡"에서 다시 볼 수 있어요.</li>
+    <li>효과·배경음·중복 여부는 "설정"에서 바꿔요.</li>
+  </ol>
+  <button class="act" type="button" data-close>시작하기</button>
+</dialog>
+<dialog id="settings">
+  <h2>설정</h2>
+  <label class="opt"><input type="checkbox" id="optFx"> 화려함 끄기 (파티클·안개·움직임)</label>
+  <label class="opt"><input type="checkbox" id="optBgm"> 배경음 끄기</label>
+  <label class="opt"><input type="checkbox" id="optDup"> 같은 곡이 다시 나오는 것 허용</label>
+  <div class="row">
+    <button class="act" id="openGuide" type="button">사용법 다시 보기</button>
+    <button class="act" type="button" data-close>닫기</button>
+  </div>
+</dialog>
+<dialog id="library">
+  <h2>내 곡</h2>
+  <div class="row" style="margin-top:0">
+    <button class="act" type="button" data-tab="h" aria-pressed="true">뽑은 곡</button>
+    <button class="act" type="button" data-tab="l" aria-pressed="false">좋아요</button>
+  </div>
+  <ul class="lib-list" id="libList"></ul>
+  <p class="lib-empty" id="libEmpty" hidden></p>
+  <div class="row">
+    <button class="act" id="clearLib" type="button">기록 지우기</button>
+    <button class="act" type="button" data-close>닫기</button>
+  </div>
+</dialog>
+
+<script>
+  // [제목, 가수, 발매일, 설명] - 이 목록을 고치면 추천 곡이 바뀝니다.
+  const SONGS = [
+    // K-POP
+    ["Dynamite", "BTS", "2020.08", "BTS 첫 전곡 영어 싱글, 빌보드 핫100 1위"],
+    ["Butter", "BTS", "2021.05", "여름 느낌의 BTS 댄스 팝, 핫100 1위를 오래 지킨 곡"],
+    ["봄날", "BTS", "2017.02", "그리움을 담은 BTS의 대표 곡"],
+    ["Boy With Luv", "BTS", "2019.04", "할시가 함께한 경쾌한 BTS 곡"],
+    ["Fake Love", "BTS", "2018.05", "록 사운드가 강한 BTS 대표곡"],
+    ["Seven", "정국", "2023.07", "정국의 첫 솔로 싱글, 라토 참여"],
+    ["APT.", "로제 & Bruno Mars", "2024.10", "로제와 브루노 마스, 게임에서 따온 중독성 후렴"],
+    ["Rockstar", "리사", "2024.06", "당당한 분위기의 리사 솔로 곡"],
+    ["Like Crazy", "지민", "2023.03", "지민 솔로 앨범 FACE의 타이틀곡"],
+    ["How You Like That", "BLACKPINK", "2020.06", "블랙핑크의 강렬한 힙합 기반 곡"],
+    ["뚜두뚜두", "BLACKPINK", "2018.06", "블랙핑크 미니 1집 Square Up 타이틀곡"],
+    ["Kill This Love", "BLACKPINK", "2019.04", "웅장한 브라스가 인상적인 블랙핑크 곡"],
+    ["Pink Venom", "BLACKPINK", "2022.08", "블랙핑크 정규 2집 선공개 싱글"],
+    ["Shut Down", "BLACKPINK", "2022.09", "클래식 샘플이 쓰인 블랙핑크 곡"],
+    ["LOVE DIVE", "IVE", "2022.04", "중독성 있는 후렴의 아이브 대표곡"],
+    ["After LIKE", "IVE", "2022.08", "ABBA 곡을 샘플링한 아이브 곡"],
+    ["I AM", "IVE", "2023.04", "아이브 첫 정규 앨범 타이틀곡"],
+    ["Kitsch", "IVE", "2023.03", "아이브 미니 2집 타이틀곡"],
+    ["Ditto", "NewJeans", "2022.12", "서정적인 겨울 감성의 뉴진스 곡"],
+    ["Hype Boy", "NewJeans", "2022.08", "뉴진스 데뷔 앨범 수록곡"],
+    ["OMG", "NewJeans", "2023.01", "뉴진스 두 번째 싱글 앨범 타이틀곡"],
+    ["Super Shy", "NewJeans", "2023.07", "뉴진스 미니 2집 Get Up 수록곡"],
+    ["Attention", "NewJeans", "2022.08", "뉴진스 데뷔 앨범의 첫 트랙"],
+    ["Next Level", "aespa", "2021.05", "강렬한 사운드의 에스파 대표곡"],
+    ["Supernova", "aespa", "2024.05", "에스파 미니 앨범 Armageddon 타이틀곡"],
+    ["Whiplash", "aespa", "2024.10", "에스파 미니 5집 타이틀곡"],
+    ["ANTIFRAGILE", "LE SSERAFIM", "2022.10", "르세라핌 미니 2집 타이틀곡"],
+    ["UNFORGIVEN", "LE SSERAFIM", "2023.05", "르세라핌 첫 정규 앨범 타이틀곡"],
+    ["Magnetic", "ILLIT", "2024.03", "아일릿의 데뷔곡"],
+    ["TOMBOY", "(여자)아이들", "2022.03", "(여자)아이들의 당당한 자기 선언 곡"],
+    ["퀸카 (Queencard)", "(여자)아이들", "2023.05", "(여자)아이들의 자신감 넘치는 곡"],
+    ["God's Menu", "Stray Kids", "2020.06", "요리 콘셉트의 스트레이 키즈 곡"],
+    ["MANIAC", "Stray Kids", "2022.03", "스트레이 키즈 Oddinary 타이틀곡"],
+    ["TT", "TWICE", "2016.10", "울먹이는 표정을 뜻하는 트와이스 곡"],
+    ["Cheer Up", "TWICE", "2016.04", "트와이스를 대표하는 곡"],
+    ["Feel Special", "TWICE", "2019.09", "트와이스 미니 8집 타이틀곡"],
+    ["강남스타일", "싸이", "2012.07", "싸이의 곡, 빌보드 핫100 2위"],
+    ["판타스틱 베이비", "BIGBANG", "2012.02", "빅뱅 ALIVE 수록곡"],
+    ["뱅뱅뱅", "BIGBANG", "2015.06", "빅뱅 MADE 시리즈 싱글"],
+    ["Gee", "소녀시대", "2009.01", "소녀시대를 대표하는 곡"],
+    ["Bad Boy", "Red Velvet", "2018.01", "레드벨벳의 리패키지 앨범 곡"],
+    ["Psycho", "Red Velvet", "2019.12", "레드벨벳 The ReVe Festival 타이틀곡"],
+    ["Love Shot", "EXO", "2018.12", "엑소 리패키지 앨범 타이틀곡"],
+    ["쏘리 쏘리", "슈퍼주니어", "2009.03", "슈퍼주니어를 대표하는 곡"],
+    ["Blueming", "아이유", "2019.11", "아이유 미니 5집 Love poem 타이틀곡"],
+    ["Celebrity", "아이유", "2021.01", "아이유 LILAC 선공개곡"],
+    ["좋은 날", "아이유", "2010.12", "3단 고음으로 유명한 아이유 곡"],
+    ["밤편지", "아이유", "2017.03", "아이유의 잔잔한 감성 발라드"],
+    ["벚꽃 엔딩", "버스커 버스커", "2012.03", "봄마다 다시 사랑받는 곡"],
+    ["사건의 지평선", "윤하", "2021.12", "윤하의 곡, 뒤늦게 다시 인기를 얻음"],
+    // 아이유 - 비교적 덜 알려진 곡
+    ["비밀", "아이유", "2011.11", "웅장한 코러스가 어우러진 아이유 발라드"],
+    ["잠자는 숲속의 왕자", "아이유", "2011.11", "아이유 정규 2집 Last Fantasy 수록곡"],
+    ["삼촌", "아이유", "2011.11", "아이유 정규 2집 Last Fantasy 수록곡"],
+    ["개여울", "아이유", "2017.09", "정미조의 곡을 아이유가 리메이크"],
+    ["비밀의 화원", "아이유", "2017.09", "이상은의 곡을 아이유가 리메이크"],
+    ["매일 그대와", "아이유", "2017.09", "들국화의 곡을 아이유가 리메이크"],
+    ["어젯밤 이야기", "아이유", "2017.09", "소방차의 곡을 아이유가 리메이크"],
+    // POP
+    ["Blinding Lights", "The Weeknd", "2019.11", "80년대 신스팝 느낌의 The Weeknd 곡"],
+    ["Save Your Tears", "The Weeknd", "2020.03", "The Weeknd After Hours 수록곡"],
+    ["Starboy", "The Weeknd", "2016.09", "다프트 펑크가 참여한 The Weeknd 곡"],
+    ["Shape of You", "Ed Sheeran", "2017.01", "에드 시런의 대표곡"],
+    ["Perfect", "Ed Sheeran", "2017.03", "에드 시런의 러브송"],
+    ["Thinking Out Loud", "Ed Sheeran", "2014.06", "에드 시런의 소울풍 러브송"],
+    ["Someone Like You", "Adele", "2011.01", "아델의 피아노 발라드"],
+    ["Rolling in the Deep", "Adele", "2010.11", "아델의 힘 있는 대표곡"],
+    ["Easy On Me", "Adele", "2021.10", "아델 앨범 30의 리드 싱글"],
+    ["bad guy", "Billie Eilish", "2019.03", "속삭이듯 부르는 빌리 아일리시 곡"],
+    ["Happier Than Ever", "Billie Eilish", "2021.07", "후반부가 폭발하는 빌리 아일리시 곡"],
+    ["BIRDS OF A FEATHER", "Billie Eilish", "2024.05", "빌리 아일리시 HIT ME HARD AND SOFT 수록곡"],
+    ["Levitating", "Dua Lipa", "2020.03", "두아 리파의 디스코 팝"],
+    ["Don't Start Now", "Dua Lipa", "2019.11", "두아 리파의 디스코 풍 곡"],
+    ["Flowers", "Miley Cyrus", "2023.01", "자기 자신을 사랑하는 내용의 마일리 사이러스 곡"],
+    ["As It Was", "Harry Styles", "2022.04", "해리 스타일스 Harry's House 리드 싱글"],
+    ["Watermelon Sugar", "Harry Styles", "2019.12", "여름 느낌의 해리 스타일스 곡"],
+    ["drivers license", "Olivia Rodrigo", "2021.01", "올리비아 로드리고의 데뷔 싱글"],
+    ["good 4 u", "Olivia Rodrigo", "2021.05", "올리비아 로드리고의 팝 펑크 곡"],
+    ["Anti-Hero", "Taylor Swift", "2022.10", "테일러 스위프트 Midnights 수록곡"],
+    ["Shake It Off", "Taylor Swift", "2014.08", "테일러 스위프트 1989 리드 싱글"],
+    ["Love Story", "Taylor Swift", "2008.09", "테일러 스위프트 초기 대표곡"],
+    ["Cruel Summer", "Taylor Swift", "2019.08", "테일러 스위프트 Lover 수록곡, 뒤늦게 큰 인기"],
+    ["Uptown Funk", "Mark Ronson ft. Bruno Mars", "2014.11", "마크 론슨과 브루노 마스의 펑크 곡"],
+    ["Just the Way You Are", "Bruno Mars", "2010.07", "브루노 마스의 첫 솔로 싱글"],
+    ["Die With A Smile", "Lady Gaga & Bruno Mars", "2024.08", "레이디 가가와 브루노 마스의 듀엣"],
+    ["Shallow", "Lady Gaga & Bradley Cooper", "2018.09", "영화 스타 이즈 본 수록곡"],
+    ["Bad Romance", "Lady Gaga", "2009.10", "레이디 가가의 대표 댄스 팝"],
+    ["Umbrella", "Rihanna", "2007.03", "리한나의 대표곡, 제이지 참여"],
+    ["Stay", "The Kid LAROI & Justin Bieber", "2021.07", "키드 라로이와 저스틴 비버, 핫100 1위"],
+    ["Peaches", "Justin Bieber", "2021.03", "저스틴 비버 Justice 수록곡"],
+    ["Love Yourself", "Justin Bieber", "2015.11", "에드 시런이 함께 쓴 저스틴 비버 곡"],
+    ["Despacito", "Luis Fonsi & Daddy Yankee", "2017.01", "스페인어 곡으로 세계적 히트"],
+    ["Sunflower", "Post Malone & Swae Lee", "2018.10", "스파이더맨 애니메이션 OST"],
+    ["Circles", "Post Malone", "2019.09", "포스트 말론의 팝 록 곡"],
+    ["Believer", "Imagine Dragons", "2017.02", "이매진 드래곤스의 강렬한 곡"],
+    ["Counting Stars", "OneRepublic", "2013.06", "원리퍼블릭의 대표곡"],
+    ["Happy", "Pharrell Williams", "2013.11", "슈퍼배드 2 OST"],
+    ["Havana", "Camila Cabello", "2017.08", "영 서그가 참여한 카밀라 카베요 곡"],
+    ["Attention", "Charlie Puth", "2017.04", "Voicenotes 앨범 선공개 싱글"],
+    ["See You Again", "Wiz Khalifa ft. Charlie Puth", "2015.04", "분노의 질주 OST"],
+    ["Closer", "The Chainsmokers", "2016.07", "체인스모커스와 홀지의 곡"],
+    ["Someone You Loved", "Lewis Capaldi", "2018.11", "루이스 카팔디의 발라드"],
+    ["Let Her Go", "Passenger", "2012.07", "패신저의 어쿠스틱 곡"],
+    ["All of Me", "John Legend", "2013.08", "존 레전드의 피아노 발라드"],
+    ["Titanium", "David Guetta ft. Sia", "2011.08", "데이비드 게타와 시아의 일렉트로닉 팝"],
+    ["Firework", "Katy Perry", "2010.10", "케이티 페리의 희망적인 팝"],
+    ["Espresso", "Sabrina Carpenter", "2024.04", "사브리나 카펜터의 여름 팝"],
+    ["Please Please Please", "Sabrina Carpenter", "2024.06", "사브리나 카펜터의 핫100 1위 곡"],
+    ["Dance Monkey", "Tones and I", "2019.05", "톤스 앤 아이의 세계적 히트곡"]
+  ];
+  const $ = (id) => document.getElementById(id);
+  const rootEl = document.documentElement;
+
+  /* ---------- 시간대별 배경 ---------- */
+  function phaseFor(h) {
+    if (h >= 5 && h < 8) return "dawn";
+    if (h >= 8 && h < 11) return "morning";
+    if (h >= 11 && h < 17) return "day";
+    if (h >= 17 && h < 19) return "sunset";
+    if (h >= 19 && h < 21) return "dusk";
+    return "night";
+  }
+  function applyPhase() {
+    rootEl.dataset.phase = phaseFor(new Date().getHours());
+  }
+  applyPhase();
+  setInterval(applyPhase, 60000);
+
+  /* ---------- 인트로 ---------- */
+  const intro = $("intro");
+  const app = $("app");
+  let introDone = false;
+  rootEl.classList.add("intro-on");
+  app.inert = true;
+
+  function endIntro() {
+    if (introDone) return;
+    introDone = true;
+    rootEl.classList.remove("intro-on");
+    app.inert = false;
+    intro.hidden = true;
+    afterIntro();
+  }
+  function skipIntro() {
+    if (introDone) return;
+    const current = getComputedStyle(intro).opacity;
+    intro.style.animation = "none";
+    intro.style.opacity = current;
+    intro.style.transition = "opacity 0.45s ease";
+    void intro.offsetWidth;
+    intro.style.opacity = "0";
+    setTimeout(endIntro, 480);
+  }
+  intro.addEventListener("animationend", (e) => {
+    if (e.target === intro) endIntro();
+  });
+  intro.addEventListener("click", skipIntro);
+  document.addEventListener("keydown", skipIntro);
+  setTimeout(endIntro, 7000); // 안전장치
+
+  /* ---------- 노래 뽑기 ---------- */
+  const recordEl = $("record");
+  const titleEl = $("title");
+  const artistEl = $("artist");
+  const listenEl = $("listen");
+  const lyricsEl = $("lyrics");
+  const likeBtn = $("like");
+  const metaEl = $("meta");
+  const descEl = $("desc");
+  const actionsEl = $("actions");
+  const noteEl = $("note");
+  const emptyEl = $("empty");
+  const pickBtn = $("pick");
+  const countEl = $("count");
+  const statusEl = $("status");
+  const historyEl = $("history");
+  const historyList = $("historyList");
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let bag = [];
+  let lastIndex = -1;
+  let rotation = 0;
+  let busy = false;
+  const recent = [];
+
+  function refillBag() {
+    bag = SONGS.map((_, i) => i);
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    // 새 라운드 첫 곡이 직전 곡과 같지 않게
+    if (bag[bag.length - 1] === lastIndex) {
+      [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+    }
+  }
+
+  let current = null;
+  function showSong(song, rolling) {
+    emptyEl.hidden = true;
+    titleEl.hidden = false;
+    artistEl.hidden = false;
+    titleEl.textContent = song[0];
+    artistEl.textContent = song[1];
+    titleEl.classList.toggle("rolling", !!rolling);
+    metaEl.hidden = descEl.hidden = actionsEl.hidden = !!rolling;
+    if (rolling) return;
+    metaEl.textContent = "발매일 " + song[2];
+    descEl.textContent = song[3];
+    listenEl.href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(song[0] + " " + song[1]);
+    lyricsEl.href = "https://www.google.com/search?q=" + encodeURIComponent(song[0] + " " + song[1] + " 가사");
+  }
+
+  function renderHistory() {
+    historyList.innerHTML = "";
+    store.h.slice(0, 5).forEach((k) => {
+      const s = byKey.get(k);
+      if (!s) return;
+      const li = document.createElement("li");
+      li.textContent = s[0] + " ";
+      const span = document.createElement("span");
+      span.textContent = s[1];
+      li.appendChild(span);
+      historyList.appendChild(li);
+    });
+    historyEl.hidden = store.h.length === 0;
+    $("openAll").textContent = "뽑은 곡 전체 보기 (" + store.h.length + ")";
+  }
+
+  function finish(index) {
+    const song = SONGS[index];
+    lastIndex = index;
+    current = song;
+    const h = hueOf(song);
+    rootEl.style.setProperty("--h", h);
+    rootEl.dataset.song = "1";
+    showSong(song, false);
+    syncLike();
+    store.h.unshift(keyOf(song));
+    if (store.h.length > 500) store.h.length = 500;
+    save();
+    countEl.textContent = store.dup ? "지금까지 " + store.h.length + "번 뽑았어요" : (SONGS.length - bag.length) + " / " + SONGS.length + "곡";
+    statusEl.textContent = song[0] + ", " + song[1];
+    renderHistory();
+    const r = recordEl.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, h, 70);
+    tuneAudio(h);
+    pickBtn.textContent = "다시 뽑기";
+    pickBtn.disabled = false;
+    busy = false;
+  }
+
+  function pick() {
+    if (busy) return;
+    busy = true;
+    pickBtn.disabled = true;
+    let index;
+    if (store.dup) {
+      do { index = Math.floor(Math.random() * SONGS.length); } while (index === lastIndex);
+    } else {
+      if (bag.length === 0) refillBag();
+      index = bag.pop();
+    }
+
+    rotation += 720 + Math.floor(Math.random() * 360);
+    recordEl.style.transform = "rotate(" + rotation + "deg)";
+
+    if (reduceMotion || !store.fx) {
+      finish(index);
+      return;
+    }
+    const ticker = setInterval(() => {
+      showSong(SONGS[Math.floor(Math.random() * SONGS.length)], true);
+    }, 80);
+    setTimeout(() => {
+      clearInterval(ticker);
+      finish(index);
+    }, 1100);
+  }
+
+  pickBtn.addEventListener("click", pick);
+
+  /* ---------- 저장 · 설정 ---------- */
+  const KEY = "ods:v2";
+  const store = { seen: 0, fx: 1, bgm: 1, dup: 1, h: [], likes: [] };
+  try { Object.assign(store, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+  const keyOf = (s) => s[0] + "|" + s[1];
+  const byKey = new Map(SONGS.map((s) => [keyOf(s), s]));
+  function hueOf(s) {
+    const k = keyOf(s);
+    let x = 0;
+    for (let i = 0; i < k.length; i++) x = (x * 31 + k.charCodeAt(i)) % 360;
+    return x;
+  }
+
+  /* ---------- 파티클 ---------- */
+  const cv = $("fx");
+  const ctx = cv.getContext("2d");
+  let parts = [], raf = 0;
+  function fitCanvas() { cv.width = innerWidth; cv.height = innerHeight; }
+  addEventListener("resize", fitCanvas);
+  fitCanvas();
+  function burst(x, y, hue, n) {
+    if (!store.fx || reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 6;
+      parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, life: 1, r: 1.5 + Math.random() * 3.5, h: (hue + Math.random() * 60 - 30 + 360) % 360 });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+  function tick() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter((p) => p.life > 0);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.09; p.vx *= 0.985; p.life -= 0.011;
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.fillStyle = "hsl(" + p.h + " 95% 68%)";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.283);
+      ctx.fill();
+    }
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) ctx.clearRect(0, 0, cv.width, cv.height);
+  }
+  function afterIntro() {
+    burst(innerWidth / 2, innerHeight * 0.4, 320, 110);
+    setTimeout(() => burst(innerWidth * 0.2, innerHeight * 0.5, 40, 50), 250);
+    setTimeout(() => burst(innerWidth * 0.8, innerHeight * 0.5, 200, 50), 450);
+    if (!store.seen) setTimeout(() => dlg.guide.showModal(), 900);
+  }
+
+  /* ---------- 배경음 (코드로 만든 잔잔한 화음) ---------- */
+  let ac, master, notes = [];
+  function startAudio() {
+    try {
+      if (!store.bgm) return;
+      if (!ac) {
+        ac = new (window.AudioContext || window.webkitAudioContext)();
+        master = ac.createGain();
+        master.gain.value = 0;
+        const lp = ac.createBiquadFilter();
+        lp.type = "lowpass";
+        lp.frequency.value = 800;
+        master.connect(lp);
+        lp.connect(ac.destination);
+        [1, 1.25, 1.5, 2, 2.5].forEach((r, i) => {
+          const o = ac.createOscillator();
+          o.type = i % 2 ? "triangle" : "sine";
+          o.detune.value = (i - 2) * 4;
+          o.frequency.value = 130.81 * r;
+          o.connect(master);
+          o.start();
+          notes.push([o, r]);
+        });
+        if (current) tuneAudio(hueOf(current));
+      }
+      if (ac.state === "suspended") ac.resume();
+      master.gain.setTargetAtTime(0.03, ac.currentTime, 0.8);
+    } catch (e) {}
+  }
+  function tuneAudio(h) {
+    if (!ac) return;
+    const base = 130.81 * Math.pow(2, Math.floor(h / 30) / 12);
+    notes.forEach(([o, r]) => o.frequency.setTargetAtTime(base * r, ac.currentTime, 0.9));
+  }
+  ["pointerdown", "keydown"].forEach((ev) => document.addEventListener(ev, startAudio));
+
+  /* ---------- 대화상자 · 설정 ---------- */
+  const dlg = { guide: $("guide"), set: $("settings"), lib: $("library") };
+  $("openSet").addEventListener("click", () => dlg.set.showModal());
+  $("openLib").addEventListener("click", () => { renderLib(); dlg.lib.showModal(); });
+  $("openAll").addEventListener("click", () => { libTab = "h"; renderLib(); dlg.lib.showModal(); });
+  $("openGuide").addEventListener("click", () => { dlg.set.close(); dlg.guide.showModal(); });
+  document.querySelectorAll("dialog [data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
+  dlg.guide.addEventListener("close", () => { store.seen = 1; save(); });
+
+  function applySettings() {
+    rootEl.classList.toggle("calm", !store.fx);
+    $("optFx").checked = !store.fx;
+    $("optBgm").checked = !store.bgm;
+    $("optDup").checked = !!store.dup;
+    noteEl.textContent = store.dup ? "같은 곡이 다시 나올 수 있어요." : "모든 곡을 한 번씩 뽑기 전에는 같은 곡이 다시 나오지 않아요.";
+    if (!store.fx) parts = [];
+    if (!store.bgm && ac) master.gain.setTargetAtTime(0, ac.currentTime, 0.3);
+  }
+  $("optFx").addEventListener("change", (e) => { store.fx = e.target.checked ? 0 : 1; save(); applySettings(); });
+  $("optBgm").addEventListener("change", (e) => { store.bgm = e.target.checked ? 0 : 1; save(); applySettings(); startAudio(); });
+  $("optDup").addEventListener("change", (e) => { store.dup = e.target.checked ? 1 : 0; save(); applySettings(); });
+
+  /* ---------- 좋아요 ---------- */
+  function syncLike() {
+    if (!current) return;
+    const on = store.likes.includes(keyOf(current));
+    likeBtn.setAttribute("aria-pressed", on);
+    likeBtn.textContent = on ? "♥ 좋아요 취소" : "♡ 좋아요";
+  }
+  likeBtn.addEventListener("click", () => {
+    if (!current) return;
+    const k = keyOf(current), i = store.likes.indexOf(k);
+    if (i >= 0) store.likes.splice(i, 1);
+    else {
+      store.likes.unshift(k);
+      const r = likeBtn.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height / 2, 340, 24);
+    }
+    save();
+    syncLike();
+  });
+
+  /* ---------- 내 곡 (뽑은 곡 전체 · 좋아요) ---------- */
+  let libTab = "h", armed = false;
+  document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { libTab = b.dataset.tab; renderLib(); }));
+  function renderLib() {
+    const list = libTab === "h" ? store.h : store.likes;
+    document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.tab === libTab));
+    const ul = $("libList");
+    ul.innerHTML = "";
+    list.forEach((k) => {
+      const s = byKey.get(k);
+      if (!s) return;
+      const li = document.createElement("li");
+      li.textContent = s[0] + " ";
+      const sp = document.createElement("span");
+      sp.textContent = s[1] + " · " + s[2];
+      li.appendChild(sp);
+      ul.appendChild(li);
+    });
+    $("libEmpty").hidden = list.length > 0;
+    $("libEmpty").textContent = libTab === "h" ? "아직 뽑은 곡이 없어요." : "아직 좋아요한 곡이 없어요.";
+    armed = false;
+    $("clearLib").textContent = "기록 지우기";
+    $("clearLib").hidden = libTab !== "h" || !list.length;
+  }
+  $("clearLib").addEventListener("click", (e) => {
+    if (!armed) { armed = true; e.target.textContent = "한 번 더 누르면 지워요"; return; }
+    store.h = [];
+    save();
+    renderHistory();
+    renderLib();
+  });
+
+  applySettings();
+  renderHistory();
+</script>
+</body>
+  </html>
